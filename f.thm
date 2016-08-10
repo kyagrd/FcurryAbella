@@ -1,0 +1,117 @@
+%%% f.thm
+Specification "f".
+Close ty, tm.
+
+
+Define name : tm -> prop by
+  nabla x, name x.
+
+Define fresh : tm -> o -> prop by
+  nabla x, fresh x E.
+
+Define freshlist : tm -> olist -> prop by
+  nabla x, freshlist x E.
+
+
+Theorem member_fresh : forall X L E,
+  member E L -> freshlist X L -> fresh X E.
+
+induction on 1. intros. case H1.
+  case H2. search.
+  assert freshlist X L1.
+    case H2. search.
+    apply IH to H3 H4. search.
+
+
+Define ctx : olist -> prop by
+  ctx nil ;
+  ctx (of X T :: L) := freshlist X L /\ ctx L.
+
+/*
+Define ctx : olist -> prop by
+  ctx nil
+; nabla x, ctx (of x T :: L) := ctx L.
+*/
+
+
+Theorem of_name : 
+  forall L E,
+  ctx L -> member E L ->
+  exists X T, E = of X T /\ name X.
+
+induction on 1. intros. case H1.
+  case H2.
+  case H3. case H2.
+    search.
+    apply IH to H4 H5. search.
+
+
+Theorem ctx_uniq : forall L E T1 T2,
+  ctx L -> member (of E T1) L -> member (of E T2) L -> T1 = T2.
+
+induction on 1. intros. case H1.
+  case H2.
+  case H2.
+    case H3.
+      search.
+      apply member_fresh to H6 H4. case H7.
+    case H3.
+      apply member_fresh to H6 H4. case H7.
+      apply IH to H5 H6 H7. search.
+
+
+
+
+
+
+Theorem abs_inst1 : forall L N U T R U1,
+  ctx L -> {L |- of (abs R) U1} -> {L |- inst (arr U T) U1} -> {L |- of N U} ->
+  {L |- of (R N) T}.
+
+skip.
+
+
+Theorem abs_inst2 : forall L N U T R T1,
+  ctx L -> {L |- of (abs R) T1} -> {L |- inst T1 (arr U T)} -> {L |- of N U} ->
+  {L |- of (R N) T}.
+
+skip.
+
+
+
+Theorem abs_arr: forall L R N U T,
+  ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.
+
+induction on 2. intros.
+case H2.
+  % Subgoal 1
+  inst H4 with n1 = N.  cut H5 with H3.  search.
+  % Subgoal 2
+  apply abs_inst1 to _ H5 H4 H3.  search.
+  % Subgoal 3
+  apply abs_inst2 to _ H5 H4 H3.  search.
+  % Subgoal 4
+  apply of_name to _ H5.  case H4.  case H6.
+
+
+
+Theorem step_preserves_of: forall L M N T,
+  ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.
+
+induction on 2. intros.
+case H2.
+  % Subgoal 1
+  case H3.
+    apply IH to _ H4 H6. search.      % 1.1
+    apply IH to _ H5 H6. search.      % 1.2
+    apply abs_arr to _ H4 H5. search. % 1.3
+  % Subgoal 2
+  case H3. apply IH to _ H4 H5. search.
+  % Subgoal 3
+  apply IH to _ H5 H3. search.
+  % Subgoal 4
+  apply IH to _ H5 H3. search.
+  % Subgoal 5
+  apply of_name to _ H5.
+  case H4. case H3. case H6. case H6. case H6. case H6.
+
