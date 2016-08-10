@@ -60,39 +60,10 @@ induction on 1. intros. case H1.
       apply IH to H5 H6 H7. search.
 
 
-
-
-
-
-Theorem abs_inst1 : forall L N U T R U1,
-  ctx L -> {L |- of (abs R) U1} -> {L |- inst (arr U T) U1} -> {L |- of N U} ->
-  {L |- of (R N) T}.
-
-skip.
-
-
-Theorem abs_inst2 : forall L N U T R T1,
-  ctx L -> {L |- of (abs R) T1} -> {L |- inst T1 (arr U T)} -> {L |- of N U} ->
-  {L |- of (R N) T}.
-
-skip.
-
-
-
 Theorem abs_arr: forall L R N U T,
   ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.
 
-induction on 2. intros.
-case H2.
-  % Subgoal 1
-  inst H4 with n1 = N.  cut H5 with H3.  search.
-  % Subgoal 2
-  apply abs_inst1 to _ H5 H4 H3.  search.
-  % Subgoal 3
-  apply abs_inst2 to _ H5 H4 H3.  search.
-  % Subgoal 4
-  apply of_name to _ H5.  case H4.  case H6.
-
+skip. % This must be true but don't yet have an idea how to prove in Abella
 
 
 Theorem step_preserves_of: forall L M N T,
@@ -104,7 +75,7 @@ case H2.
   case H3.
     apply IH to _ H4 H6. search.      % 1.1
     apply IH to _ H5 H6. search.      % 1.2
-    apply abs_arr to _ H4 H5. search. % 1.3
+    apply abs_arr to _ H4 H5. search. % 1.3 (abs_arr lemma used)
   % Subgoal 2
   case H3. apply IH to _ H4 H5. search.
   % Subgoal 3
