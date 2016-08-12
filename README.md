@@ -1,8 +1,20 @@
 # Type preservation in the Curry-style System F using Abella
 
-The proof  (see `f.thm`) uses a lemma (`abs_arr`), which has not been proven
-(that is, `skip`ped) in Abella. Believing the lemma is true, the proof is
-fairly mechanic.
+Thanks to Todd Wilson and Kaustav Chaaudhuri for their comments and
+suggestions on the abella-theorem-prover mailing list.
+
+For the first time in my life I have developed a fully mechanized proof for
+type preservation of a polymorphic lambda calculus, which I can actually
+understand the details, without having to rely on name binding libraries
+which I don't fully understand (or, even if I understood the background theory,
+often times either painfully tedious or equipped with tactis of back wizardary).
+With the power of higher-order relational specification and framework for
+context handling by two-level logic of Abella just makes it work (of course,
+with some efforts to learn the syntax of lambda prolog and basic Abella
+commands). Without importing any other libraries, the full mechaized proof
+is less than 150 lines of Abella code including the specification and
+definition files. This is so cool considering that Abella is not
+equipped with very rich automated tactics as in Coq or Isabelle.
 
 ## Proof log from Abella's `-o` output 
 
@@ -538,67 +550,665 @@ Proof completed.
 </pre>
 <a name="43"></a>
 <pre class="code">
-Abella < <b>Theorem of_void : 
-forall L M T, ctx L -> {L |- of M (all a\a)} -> {L |- of M T}.</b>
+Abella < <b>Theorem abs_insts_arr : 
+forall L R N U T S, ctx L -> {L |- of (abs R) S} ->
+  {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.</b>
 
 </pre>
 <a name="44"></a>
 <pre class="code">
 
 ============================
- forall L M T, ctx L -> {L |- of M (all a\a)} -> {L |- of M T}
+ forall L R N U T S, ctx L -> {L |- of (abs R) S} ->
+   {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
 
-of_void < <b>intros.</b>
+abs_insts_arr < <b>induction on 2.</b>
 </pre>
 <a name="45"></a>
 <pre class="code">
 
-Variables: L M T
-H1 : ctx L
-H2 : {L |- of M (all a\a)}
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
 ============================
- {L |- of M T}
+ forall L R N U T S, ctx L -> {L |- of (abs R) S}@ ->
+   {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
 
-of_void < <b>assert {L |- inst (all a\a) T}.</b>
+abs_insts_arr < <b>intros.</b>
 </pre>
 <a name="46"></a>
 <pre class="code">
 
-Variables: L M T
+Variables: L R N U T S
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
 H1 : ctx L
-H2 : {L |- of M (all a\a)}
-H3 : {L |- inst (all a\a) T}
+H2 : {L |- of (abs R) S}@
+H3 : {L |- insts S (arr U T)}
+H4 : {L |- of N U}
 ============================
- {L |- of M T}
+ {L |- of (R N) T}
 
-of_void < <b>search.</b>
-Proof completed.
+abs_insts_arr < <b>case H2.</b>
 </pre>
 <a name="47"></a>
 <pre class="code">
-Abella < <b>Theorem abs_inst_arr : 
-forall L R N U T S, ctx L -> {L |- of (abs R) S} ->
-  {L |- inst S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.</b>
+Subgoal 1:
 
+Variables: L R N U T U1 T1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts (arr T1 U1) (arr U T)}
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H3.</b>
 </pre>
 <a name="48"></a>
 <pre class="code">
+Subgoal 1.1:
 
+Variables: L R N U T
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 U |- of (R n1) T}*
 ============================
- forall L R N U T S, ctx L -> {L |- of (abs R) S} ->
-   {L |- inst S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+ {L |- of (R N) T}
 
-abs_inst_arr < <b>skip.</b>
-Proof completed.
+Subgoal 1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b> inst H5 with n1 = N.</b>
 </pre>
 <a name="49"></a>
+<pre class="code">
+Subgoal 1.1:
+
+Variables: L R N U T
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 U |- of (R n1) T}*
+H6 : {L, of N U |- of (R N) T}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>cut H6 with H4.</b>
+</pre>
+<a name="50"></a>
+<pre class="code">
+Subgoal 1.1:
+
+Variables: L R N U T
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 U |- of (R n1) T}*
+H6 : {L, of N U |- of (R N) T}*
+H7 : {L |- of (R N) T}
+============================
+ {L |- of (R N) T}
+
+Subgoal 1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>search.</b>
+</pre>
+<a name="51"></a>
+<pre class="code">
+Subgoal 1.2:
+
+Variables: L R N U T U1 T1 U2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+H6 : {L |- inst (arr T1 U1) U2}
+H7 : {L |- insts U2 (arr U T)}
+============================
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H6.</b>
+</pre>
+<a name="52"></a>
+<pre class="code">
+Subgoal 1.2:
+
+Variables: L R N U T U1 T1 U2 F
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+H7 : {L |- insts U2 (arr U T)}
+H8 : {L, [F] |- inst (arr T1 U1) U2}
+H9 : member F L
+============================
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply of_name to _ H9.</b>
+</pre>
+<a name="53"></a>
+<pre class="code">
+Subgoal 1.2:
+
+Variables: L R N U T U1 T1 U2 X T2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+H7 : {L |- insts U2 (arr U T)}
+H8 : {L, [of X T2] |- inst (arr T1 U1) U2}
+H9 : member (of X T2) L
+H10 : name X
+============================
+ {L |- of (R N) T}
+
+Subgoal 1.3 is:
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H8.</b>
+</pre>
+<a name="54"></a>
+<pre class="code">
+Subgoal 1.3:
+
+Variables: L R N U T U1 T1 F
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+H6 : {L, [F] |- insts (arr T1 U1) (arr U T)}
+H7 : member F L
+============================
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply of_name to _ H7.</b>
+</pre>
+<a name="55"></a>
+<pre class="code">
+Subgoal 1.3:
+
+Variables: L R N U T U1 T1 X T2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L, of n1 T1 |- of (R n1) U1}*
+H6 : {L, [of X T2] |- insts (arr T1 U1) (arr U T)}
+H7 : member (of X T2) L
+H8 : name X
+============================
+ {L |- of (R N) T}
+
+Subgoal 2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H6.</b>
+</pre>
+<a name="56"></a>
+<pre class="code">
+Subgoal 2:
+
+Variables: L R N U T T1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts (all T1) (arr U T)}
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H3.</b>
+</pre>
+<a name="57"></a>
+<pre class="code">
+Subgoal 2.1:
+
+Variables: L R N U T T1 U1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H6 : {L |- inst (all T1) U1}
+H7 : {L |- insts U1 (arr U T)}
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H6.</b>
+</pre>
+<a name="58"></a>
+<pre class="code">
+Subgoal 2.1.1:
+
+Variables: L R N U T T1 U2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H7 : {L |- insts (T1 U2) (arr U T)}
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b> inst H5 with n1 = U2.</b>
+</pre>
+<a name="59"></a>
+<pre class="code">
+Subgoal 2.1.1:
+
+Variables: L R N U T T1 U2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H7 : {L |- insts (T1 U2) (arr U T)}
+H8 : {L |- of (abs R) (T1 U2)}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply IH to _ H8 H7 H4.</b>
+</pre>
+<a name="60"></a>
+<pre class="code">
+Subgoal 2.1.1:
+
+Variables: L R N U T T1 U2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H7 : {L |- insts (T1 U2) (arr U T)}
+H8 : {L |- of (abs R) (T1 U2)}*
+H9 : {L |- of (R N) T}
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.1.2 is:
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>search.</b>
+</pre>
+<a name="61"></a>
+<pre class="code">
+Subgoal 2.1.2:
+
+Variables: L R N U T T1 U1 F
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H7 : {L |- insts U1 (arr U T)}
+H8 : {L, [F] |- inst (all T1) U1}
+H9 : member F L
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply of_name to _ H9.</b>
+</pre>
+<a name="62"></a>
+<pre class="code">
+Subgoal 2.1.2:
+
+Variables: L R N U T T1 U1 X T2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H7 : {L |- insts U1 (arr U T)}
+H8 : {L, [of X T2] |- inst (all T1) U1}
+H9 : member (of X T2) L
+H10 : name X
+============================
+ {L |- of (R N) T}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H8.</b>
+</pre>
+<a name="63"></a>
+<pre class="code">
+Subgoal 2.2:
+
+Variables: L R N U T T1 F
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H6 : {L, [F] |- insts (all T1) (arr U T)}
+H7 : member F L
+============================
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply of_name to _ H7.</b>
+</pre>
+<a name="64"></a>
+<pre class="code">
+Subgoal 2.2:
+
+Variables: L R N U T T1 X T2
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (T1 n1)}*
+H6 : {L, [of X T2] |- insts (all T1) (arr U T)}
+H7 : member (of X T2) L
+H8 : name X
+============================
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H6.</b>
+</pre>
+<a name="65"></a>
+<pre class="code">
+Subgoal 3:
+
+Variables: L R N U T T1 U1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts (T1 U1) (arr U T)}
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (all T1)}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>assert {L |- insts (all T1) (arr U T)}.</b>
+</pre>
+<a name="66"></a>
+<pre class="code">
+Subgoal 3:
+
+Variables: L R N U T T1 U1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts (T1 U1) (arr U T)}
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (all T1)}*
+H6 : {L |- insts (all T1) (arr U T)}
+============================
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply IH to _ H5 H6 H4.</b>
+</pre>
+<a name="67"></a>
+<pre class="code">
+Subgoal 3:
+
+Variables: L R N U T T1 U1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts (T1 U1) (arr U T)}
+H4 : {L |- of N U}
+H5 : {L |- of (abs R) (all T1)}*
+H6 : {L |- insts (all T1) (arr U T)}
+H7 : {L |- of (R N) T}
+============================
+ {L |- of (R N) T}
+
+Subgoal 4 is:
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>search.</b>
+</pre>
+<a name="68"></a>
+<pre class="code">
+Subgoal 4:
+
+Variables: L R N U T S F
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts S (arr U T)}
+H4 : {L |- of N U}
+H5 : {L, [F] |- of (abs R) S}*
+H6 : member F L
+============================
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>apply of_name to _ H6.</b>
+</pre>
+<a name="69"></a>
+<pre class="code">
+Subgoal 4:
+
+Variables: L R N U T S X T1
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts S (arr U T)}
+H4 : {L |- of N U}
+H5 : {L, [of X T1] |- of (abs R) S}*
+H6 : member (of X T1) L
+H7 : name X
+============================
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H5.</b>
+</pre>
+<a name="70"></a>
+<pre class="code">
+Subgoal 4:
+
+Variables: L R N U T S
+IH : forall L R N U T S, ctx L -> {L |- of (abs R) S}* ->
+       {L |- insts S (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- insts S (arr U T)}
+H4 : {L |- of N U}
+H6 : member (of (abs R) S) L
+H7 : name (abs R)
+============================
+ {L |- of (R N) T}
+
+abs_insts_arr < <b>case H7.</b>
+Proof completed.
+</pre>
+<a name="71"></a>
 <pre class="code">
 Abella < <b>Theorem abs_arr : 
 forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} ->
   {L |- of (R N) T}.</b>
 
 </pre>
-<a name="50"></a>
+<a name="72"></a>
 <pre class="code">
 
 ============================
@@ -607,7 +1217,7 @@ forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} ->
 
 abs_arr < <b>induction on 2.</b>
 </pre>
-<a name="51"></a>
+<a name="73"></a>
 <pre class="code">
 
 IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
@@ -618,7 +1228,7 @@ IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
 
 abs_arr < <b>intros.</b>
 </pre>
-<a name="52"></a>
+<a name="74"></a>
 <pre class="code">
 
 Variables: L R N U T
@@ -632,7 +1242,7 @@ H3 : {L |- of N U}
 
 abs_arr < <b>case H2.</b>
 </pre>
-<a name="53"></a>
+<a name="75"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -653,7 +1263,7 @@ Subgoal 3 is:
 
 abs_arr < <b> inst H4 with n1 = N.</b>
 </pre>
-<a name="54"></a>
+<a name="76"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -675,7 +1285,7 @@ Subgoal 3 is:
 
 abs_arr < <b>cut H5 with H3.</b>
 </pre>
-<a name="55"></a>
+<a name="77"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -698,37 +1308,140 @@ Subgoal 3 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="56"></a>
+<a name="78"></a>
 <pre class="code">
 Subgoal 2:
 
-Variables: L R N U T U1
+Variables: L R N U T T1 U1
 IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
        {L |- of N U} -> {L |- of (R N) T}
 H1 : ctx L
 H3 : {L |- of N U}
-H4 : {L |- inst U1 (arr U T)}*
-H5 : {L |- of (abs R) U1}*
+H4 : T1 U1 = arr U T
+H5 : {L |- of (abs R) (all T1)}*
 ============================
  {L |- of (R N) T}
 
 Subgoal 3 is:
  {L |- of (R N) T}
 
-abs_arr < <b>apply abs_inst_arr to _ H5 H4 H3.</b>
+abs_arr < <b>case H4.</b>
 </pre>
-<a name="57"></a>
+<a name="79"></a>
 <pre class="code">
-Subgoal 2:
+Subgoal 2.1:
 
-Variables: L R N U T U1
+Variables: L R N U1 T3 T2
+IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
+       {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- of N (T2 U1)}
+H5 : {L |- of (abs R) (all (z1\arr (T2 z1) (T3 z1)))}*
+============================
+ {L |- of (R N) (T3 U1)}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+abs_arr < <b>assert {L |- insts (all (z1\arr (T2 z1) (T3 z1))) (arr (T2 U1) (T3 U1))}.</b>
+</pre>
+<a name="80"></a>
+<pre class="code">
+Subgoal 2.1:
+
+Variables: L R N U1 T3 T2
+IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
+       {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- of N (T2 U1)}
+H5 : {L |- of (abs R) (all (z1\arr (T2 z1) (T3 z1)))}*
+H6 : {L |- insts (all (z1\arr (T2 z1) (T3 z1))) (arr (T2 U1) (T3 U1))}
+============================
+ {L |- of (R N) (T3 U1)}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+abs_arr < <b>apply abs_insts_arr to _ H5 H6 H3.</b>
+</pre>
+<a name="81"></a>
+<pre class="code">
+Subgoal 2.1:
+
+Variables: L R N U1 T3 T2
+IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
+       {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- of N (T2 U1)}
+H5 : {L |- of (abs R) (all (z1\arr (T2 z1) (T3 z1)))}*
+H6 : {L |- insts (all (z1\arr (T2 z1) (T3 z1))) (arr (T2 U1) (T3 U1))}
+H7 : {L |- of (R N) (T3 U1)}
+============================
+ {L |- of (R N) (T3 U1)}
+
+Subgoal 2.2 is:
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+abs_arr < <b>search.</b>
+</pre>
+<a name="82"></a>
+<pre class="code">
+Subgoal 2.2:
+
+Variables: L R N U T
 IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
        {L |- of N U} -> {L |- of (R N) T}
 H1 : ctx L
 H3 : {L |- of N U}
-H4 : {L |- inst U1 (arr U T)}*
-H5 : {L |- of (abs R) U1}*
-H6 : {L |- of (R N) T}
+H5 : {L |- of (abs R) (all z1\z1)}*
+============================
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+abs_arr < <b>assert {L |- insts (all z1\z1) (arr U T)}.</b>
+</pre>
+<a name="83"></a>
+<pre class="code">
+Subgoal 2.2:
+
+Variables: L R N U T
+IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
+       {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- of N U}
+H5 : {L |- of (abs R) (all z1\z1)}*
+H6 : {L |- insts (all z1\z1) (arr U T)}
+============================
+ {L |- of (R N) T}
+
+Subgoal 3 is:
+ {L |- of (R N) T}
+
+abs_arr < <b>apply abs_insts_arr to _ H5 H6 H3.</b>
+</pre>
+<a name="84"></a>
+<pre class="code">
+Subgoal 2.2:
+
+Variables: L R N U T
+IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
+       {L |- of N U} -> {L |- of (R N) T}
+H1 : ctx L
+H3 : {L |- of N U}
+H5 : {L |- of (abs R) (all z1\z1)}*
+H6 : {L |- insts (all z1\z1) (arr U T)}
+H7 : {L |- of (R N) T}
 ============================
  {L |- of (R N) T}
 
@@ -737,7 +1450,7 @@ Subgoal 3 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="58"></a>
+<a name="85"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -753,7 +1466,7 @@ H5 : member F L
 
 abs_arr < <b>apply of_name to _ H5.</b>
 </pre>
-<a name="59"></a>
+<a name="86"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -770,7 +1483,7 @@ H6 : name X
 
 abs_arr < <b>case H6.</b>
 </pre>
-<a name="60"></a>
+<a name="87"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -787,13 +1500,13 @@ H5 : member (of n1 T1) (L n1)
 abs_arr < <b>case H4.</b>
 Proof completed.
 </pre>
-<a name="61"></a>
+<a name="88"></a>
 <pre class="code">
 Abella < <b>Theorem step_preserves_of : 
 forall L M N T, ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.</b>
 
 </pre>
-<a name="62"></a>
+<a name="89"></a>
 <pre class="code">
 
 ============================
@@ -801,7 +1514,7 @@ forall L M N T, ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.</b>
 
 step_preserves_of < <b>induction on 2.</b>
 </pre>
-<a name="63"></a>
+<a name="90"></a>
 <pre class="code">
 
 IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
@@ -810,7 +1523,7 @@ IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
 
 step_preserves_of < <b>intros.</b>
 </pre>
-<a name="64"></a>
+<a name="91"></a>
 <pre class="code">
 
 Variables: L M N T
@@ -823,7 +1536,7 @@ H3 : {step M N}
 
 step_preserves_of < <b>case H2.</b>
 </pre>
-<a name="65"></a>
+<a name="92"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -843,14 +1556,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="66"></a>
+<a name="93"></a>
 <pre class="code">
 Subgoal 1.1:
 
@@ -876,14 +1589,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>apply IH to _ H4 H6.</b>
 </pre>
-<a name="67"></a>
+<a name="94"></a>
 <pre class="code">
 Subgoal 1.1:
 
@@ -910,14 +1623,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="68"></a>
+<a name="95"></a>
 <pre class="code">
 Subgoal 1.2:
 
@@ -940,14 +1653,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>apply IH to _ H5 H6.</b>
 </pre>
-<a name="69"></a>
+<a name="96"></a>
 <pre class="code">
 Subgoal 1.2:
 
@@ -971,14 +1684,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="70"></a>
+<a name="97"></a>
 <pre class="code">
 Subgoal 1.3:
 
@@ -997,14 +1710,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>apply abs_arr to _ H4 H5.</b>
 </pre>
-<a name="71"></a>
+<a name="98"></a>
 <pre class="code">
 Subgoal 1.3:
 
@@ -1024,14 +1737,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="72"></a>
+<a name="99"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1047,14 +1760,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="73"></a>
+<a name="100"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1070,14 +1783,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>apply IH to _ H4 H5.</b>
 </pre>
-<a name="74"></a>
+<a name="101"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1094,14 +1807,14 @@ Subgoal 3 is:
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="75"></a>
+<a name="102"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -1114,14 +1827,14 @@ H4 : {L |- of M (T1 n1)}*
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>apply IH to _ H4 H3.</b>
 </pre>
-<a name="76"></a>
+<a name="103"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -1135,51 +1848,49 @@ H5 : {L |- of N (T1 n1)}
  {L |- of N (all T1)}
 
 Subgoal 4 is:
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="77"></a>
+<a name="104"></a>
 <pre class="code">
 Subgoal 4:
 
-Variables: L M N T U
+Variables: L M N T1 U
 IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
 H1 : ctx L
 H3 : {step M N}
-H4 : {L |- inst U T}*
-H5 : {L |- of M U}*
+H4 : {L |- of M (all T1)}*
 ============================
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
-step_preserves_of < <b>apply IH to _ H5 H3.</b>
+step_preserves_of < <b>apply IH to _ H4 H3.</b>
 </pre>
-<a name="78"></a>
+<a name="105"></a>
 <pre class="code">
 Subgoal 4:
 
-Variables: L M N T U
+Variables: L M N T1 U
 IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
 H1 : ctx L
 H3 : {step M N}
-H4 : {L |- inst U T}*
-H5 : {L |- of M U}*
-H6 : {L |- of N U}
+H4 : {L |- of M (all T1)}*
+H5 : {L |- of N (all T1)}
 ============================
- {L |- of N T}
+ {L |- of N (T1 U)}
 
 Subgoal 5 is:
  {L |- of N T}
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="79"></a>
+<a name="106"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1194,7 +1905,7 @@ H5 : member F L
 
 step_preserves_of < <b>apply of_name to _ H5.</b>
 </pre>
-<a name="80"></a>
+<a name="107"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1210,7 +1921,7 @@ H6 : name X
 
 step_preserves_of < <b>case H4.</b>
 </pre>
-<a name="81"></a>
+<a name="108"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1225,7 +1936,7 @@ H6 : name M
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="82"></a>
+<a name="109"></a>
 <pre class="code">
 Subgoal 5.1:
 
@@ -1249,7 +1960,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="83"></a>
+<a name="110"></a>
 <pre class="code">
 Subgoal 5.2:
 
@@ -1270,7 +1981,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="84"></a>
+<a name="111"></a>
 <pre class="code">
 Subgoal 5.3:
 
@@ -1288,7 +1999,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="85"></a>
+<a name="112"></a>
 <pre class="code">
 Subgoal 5.4:
 
@@ -1303,7 +2014,7 @@ H6 : name (app (abs R) N1)
 step_preserves_of < <b>case H6.</b>
 Proof completed.
 </pre>
-<a name="86"></a>
+<a name="113"></a>
 <pre class="code">
 Abella < 
 </pre>
