@@ -7,7 +7,7 @@ For the first time in my life I have developed a fully mechanized proof for
 type preservation of a polymorphic lambda calculus, which I can actually
 understand the details, without having to rely on name binding libraries
 which I don't fully understand (or, even if I understood the background theory,
-often times either painfully tedious or equipped with tactis of back wizardary).
+often times either painfully tedious or equipped with tactis of black wizardary).
 With the power of higher-order relational specification and framework for
 context handling by two-level logic of Abella just makes it work (of course,
 with some efforts to learn the syntax of lambda prolog and basic Abella
