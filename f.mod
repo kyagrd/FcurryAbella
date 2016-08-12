@@ -6,9 +6,6 @@ of N (all T) :- pi a\ of N (T a).
 of N (T U) :- of N (all T). 
 
 inst (all T) (T U).
-% inst (all T) (all S) :- pi a\ inst (T a) (S a).
-% inst (arr T U) (arr T U1) :- inst U U1.
-% inst (arr T1 U) (arr T U) :- inst T T1.
 
 insts T T.
 insts T S :- inst T U, insts U S.
