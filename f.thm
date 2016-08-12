@@ -60,10 +60,19 @@ induction on 1. intros. case H1.
       apply IH to H5 H6 H7. search.
 
 
+Theorem of_void: forall L M T, ctx L -> {L |- of M (all a\a)} -> {L |- of M T}.
+intros. assert {L |- inst (all a\a) T}. search.
+
+% Theorem abs_arr_lem: forall L R N S U1 U T,
+%   ctx L -> {L |- of (abs R) (all S)} -> S U1 = arr U T -> {L |- of (R N) T}.
+% 
+% skip.
+
+
 Theorem abs_arr: forall L R N U T,
   ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.
 % thanks to Kaustuv Chaudhuri 
-induction on 2. intros. case H2. 
+induction on 2. intros. case H2.
   % Subgoal 1
   inst H4 with n1 = N. cut H5 with H3. search.
   % Subgoal 2
@@ -73,7 +82,7 @@ induction on 2. intros. case H2.
     apply of_name to _ H7. case H6.                     % 2.3
   % Subgoal 3
   case H4.
-    skip. % 3.1
+    skip.                                               % 3.1
     assert {L |- of N T3}. apply IH to _ H5 H7. search. % 3.2
     apply IH to _ H5 _. search.                         % 3.4
     apply of_name to _ H7. case H6.
@@ -101,10 +110,3 @@ case H2.
   apply of_name to _ H5.
   case H4. case H3. case H6. case H6. case H6. case H6.
 
-
-% theorem subst : forall L U R T N, nabla x,
-%   ctx L -> {L, of x U |- of (R x) T} -> {L |- of N U} ->
-%     {L |- of (R N) T}.
-% intros.
-% inst H2 with n1 = N.
-% cut H4 with H3. search.

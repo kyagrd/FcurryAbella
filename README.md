@@ -538,12 +538,50 @@ Proof completed.
 </pre>
 <a name="43"></a>
 <pre class="code">
+Abella < <b>Theorem of_void : 
+forall L M T, ctx L -> {L |- of M (all a\a)} -> {L |- of M T}.</b>
+
+</pre>
+<a name="44"></a>
+<pre class="code">
+
+============================
+ forall L M T, ctx L -> {L |- of M (all a\a)} -> {L |- of M T}
+
+of_void < <b>intros.</b>
+</pre>
+<a name="45"></a>
+<pre class="code">
+
+Variables: L M T
+H1 : ctx L
+H2 : {L |- of M (all a\a)}
+============================
+ {L |- of M T}
+
+of_void < <b>assert {L |- inst (all a\a) T}.</b>
+</pre>
+<a name="46"></a>
+<pre class="code">
+
+Variables: L M T
+H1 : ctx L
+H2 : {L |- of M (all a\a)}
+H3 : {L |- inst (all a\a) T}
+============================
+ {L |- of M T}
+
+of_void < <b>search.</b>
+Proof completed.
+</pre>
+<a name="47"></a>
+<pre class="code">
 Abella < <b>Theorem abs_arr : 
 forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} ->
   {L |- of (R N) T}.</b>
 
 </pre>
-<a name="44"></a>
+<a name="48"></a>
 <pre class="code">
 
 ============================
@@ -552,7 +590,7 @@ forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} ->
 
 abs_arr < <b>induction on 2.</b>
 </pre>
-<a name="45"></a>
+<a name="49"></a>
 <pre class="code">
 
 IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
@@ -563,7 +601,7 @@ IH : forall L R N U T, ctx L -> {L |- of (abs R) (arr U T)}* ->
 
 abs_arr < <b>intros.</b>
 </pre>
-<a name="46"></a>
+<a name="50"></a>
 <pre class="code">
 
 Variables: L R N U T
@@ -577,7 +615,7 @@ H3 : {L |- of N U}
 
 abs_arr < <b>case H2.</b>
 </pre>
-<a name="47"></a>
+<a name="51"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -601,7 +639,7 @@ Subgoal 4 is:
 
 abs_arr < <b> inst H4 with n1 = N.</b>
 </pre>
-<a name="48"></a>
+<a name="52"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -626,7 +664,7 @@ Subgoal 4 is:
 
 abs_arr < <b>cut H5 with H3.</b>
 </pre>
-<a name="49"></a>
+<a name="53"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -652,7 +690,7 @@ Subgoal 4 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="50"></a>
+<a name="54"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -674,7 +712,7 @@ Subgoal 4 is:
 
 abs_arr < <b>case H4.</b>
 </pre>
-<a name="51"></a>
+<a name="55"></a>
 <pre class="code">
 Subgoal 2.1:
 
@@ -702,7 +740,7 @@ Subgoal 4 is:
 
 abs_arr < <b>assert {L |- of N T1}.</b>
 </pre>
-<a name="52"></a>
+<a name="56"></a>
 <pre class="code">
 Subgoal 2.1:
 
@@ -731,7 +769,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply IH to _ H5 H7.</b>
 </pre>
-<a name="53"></a>
+<a name="57"></a>
 <pre class="code">
 Subgoal 2.1:
 
@@ -761,7 +799,7 @@ Subgoal 4 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="54"></a>
+<a name="58"></a>
 <pre class="code">
 Subgoal 2.2:
 
@@ -786,7 +824,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply IH to _ H5 H3.</b>
 </pre>
-<a name="55"></a>
+<a name="59"></a>
 <pre class="code">
 Subgoal 2.2:
 
@@ -812,7 +850,7 @@ Subgoal 4 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="56"></a>
+<a name="60"></a>
 <pre class="code">
 Subgoal 2.3:
 
@@ -835,7 +873,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply of_name to _ H7.</b>
 </pre>
-<a name="57"></a>
+<a name="61"></a>
 <pre class="code">
 Subgoal 2.3:
 
@@ -859,7 +897,7 @@ Subgoal 4 is:
 
 abs_arr < <b>case H6.</b>
 </pre>
-<a name="58"></a>
+<a name="62"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -878,7 +916,7 @@ Subgoal 4 is:
 
 abs_arr < <b>case H4.</b>
 </pre>
-<a name="59"></a>
+<a name="63"></a>
 <pre class="code">
 Subgoal 3.1:
 
@@ -906,7 +944,7 @@ Subgoal 4 is:
 
 abs_arr < <b>skip.</b>
 </pre>
-<a name="60"></a>
+<a name="64"></a>
 <pre class="code">
 Subgoal 3.2:
 
@@ -931,7 +969,7 @@ Subgoal 4 is:
 
 abs_arr < <b>assert {L |- of N T3}.</b>
 </pre>
-<a name="61"></a>
+<a name="65"></a>
 <pre class="code">
 Subgoal 3.2:
 
@@ -957,7 +995,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply IH to _ H5 H7.</b>
 </pre>
-<a name="62"></a>
+<a name="66"></a>
 <pre class="code">
 Subgoal 3.2:
 
@@ -984,7 +1022,7 @@ Subgoal 4 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="63"></a>
+<a name="67"></a>
 <pre class="code">
 Subgoal 3.3:
 
@@ -1006,7 +1044,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply IH to _ H5 _.</b>
 </pre>
-<a name="64"></a>
+<a name="68"></a>
 <pre class="code">
 Subgoal 3.3:
 
@@ -1029,7 +1067,7 @@ Subgoal 4 is:
 
 abs_arr < <b>search.</b>
 </pre>
-<a name="65"></a>
+<a name="69"></a>
 <pre class="code">
 Subgoal 3.4:
 
@@ -1049,7 +1087,7 @@ Subgoal 4 is:
 
 abs_arr < <b>apply of_name to _ H7.</b>
 </pre>
-<a name="66"></a>
+<a name="70"></a>
 <pre class="code">
 Subgoal 3.4:
 
@@ -1070,7 +1108,7 @@ Subgoal 4 is:
 
 abs_arr < <b>case H6.</b>
 </pre>
-<a name="67"></a>
+<a name="71"></a>
 <pre class="code">
 Subgoal 4:
 
@@ -1086,7 +1124,7 @@ H5 : member F L
 
 abs_arr < <b>apply of_name to _ H5.</b>
 </pre>
-<a name="68"></a>
+<a name="72"></a>
 <pre class="code">
 Subgoal 4:
 
@@ -1103,7 +1141,7 @@ H6 : name X
 
 abs_arr < <b>case H6.</b>
 </pre>
-<a name="69"></a>
+<a name="73"></a>
 <pre class="code">
 Subgoal 4:
 
@@ -1120,13 +1158,13 @@ H5 : member (of n1 T1) (L n1)
 abs_arr < <b>case H4.</b>
 Proof completed.
 </pre>
-<a name="70"></a>
+<a name="74"></a>
 <pre class="code">
 Abella < <b>Theorem step_preserves_of : 
 forall L M N T, ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.</b>
 
 </pre>
-<a name="71"></a>
+<a name="75"></a>
 <pre class="code">
 
 ============================
@@ -1134,7 +1172,7 @@ forall L M N T, ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.</b>
 
 step_preserves_of < <b>induction on 2.</b>
 </pre>
-<a name="72"></a>
+<a name="76"></a>
 <pre class="code">
 
 IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
@@ -1143,7 +1181,7 @@ IH : forall L M N T, ctx L -> {L |- of M T}* -> {step M N} -> {L |- of N T}
 
 step_preserves_of < <b>intros.</b>
 </pre>
-<a name="73"></a>
+<a name="77"></a>
 <pre class="code">
 
 Variables: L M N T
@@ -1156,7 +1194,7 @@ H3 : {step M N}
 
 step_preserves_of < <b>case H2.</b>
 </pre>
-<a name="74"></a>
+<a name="78"></a>
 <pre class="code">
 Subgoal 1:
 
@@ -1183,7 +1221,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="75"></a>
+<a name="79"></a>
 <pre class="code">
 Subgoal 1.1:
 
@@ -1216,7 +1254,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply IH to _ H4 H6.</b>
 </pre>
-<a name="76"></a>
+<a name="80"></a>
 <pre class="code">
 Subgoal 1.1:
 
@@ -1250,7 +1288,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="77"></a>
+<a name="81"></a>
 <pre class="code">
 Subgoal 1.2:
 
@@ -1280,7 +1318,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply IH to _ H5 H6.</b>
 </pre>
-<a name="78"></a>
+<a name="82"></a>
 <pre class="code">
 Subgoal 1.2:
 
@@ -1311,7 +1349,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="79"></a>
+<a name="83"></a>
 <pre class="code">
 Subgoal 1.3:
 
@@ -1337,7 +1375,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply abs_arr to _ H4 H5.</b>
 </pre>
-<a name="80"></a>
+<a name="84"></a>
 <pre class="code">
 Subgoal 1.3:
 
@@ -1364,7 +1402,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="81"></a>
+<a name="85"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1387,7 +1425,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="82"></a>
+<a name="86"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1410,7 +1448,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply IH to _ H4 H5.</b>
 </pre>
-<a name="83"></a>
+<a name="87"></a>
 <pre class="code">
 Subgoal 2:
 
@@ -1434,7 +1472,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="84"></a>
+<a name="88"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -1455,7 +1493,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply IH to _ H5 H3.</b>
 </pre>
-<a name="85"></a>
+<a name="89"></a>
 <pre class="code">
 Subgoal 3:
 
@@ -1477,7 +1515,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="86"></a>
+<a name="90"></a>
 <pre class="code">
 Subgoal 4:
 
@@ -1495,7 +1533,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>apply IH to _ H5 H3.</b>
 </pre>
-<a name="87"></a>
+<a name="91"></a>
 <pre class="code">
 Subgoal 4:
 
@@ -1514,7 +1552,7 @@ Subgoal 5 is:
 
 step_preserves_of < <b>search.</b>
 </pre>
-<a name="88"></a>
+<a name="92"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1529,7 +1567,7 @@ H5 : member F L
 
 step_preserves_of < <b>apply of_name to _ H5.</b>
 </pre>
-<a name="89"></a>
+<a name="93"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1545,7 +1583,7 @@ H6 : name X
 
 step_preserves_of < <b>case H4.</b>
 </pre>
-<a name="90"></a>
+<a name="94"></a>
 <pre class="code">
 Subgoal 5:
 
@@ -1560,7 +1598,7 @@ H6 : name M
 
 step_preserves_of < <b>case H3.</b>
 </pre>
-<a name="91"></a>
+<a name="95"></a>
 <pre class="code">
 Subgoal 5.1:
 
@@ -1584,7 +1622,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="92"></a>
+<a name="96"></a>
 <pre class="code">
 Subgoal 5.2:
 
@@ -1605,7 +1643,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="93"></a>
+<a name="97"></a>
 <pre class="code">
 Subgoal 5.3:
 
@@ -1623,7 +1661,7 @@ Subgoal 5.4 is:
 
 step_preserves_of < <b>case H6.</b>
 </pre>
-<a name="94"></a>
+<a name="98"></a>
 <pre class="code">
 Subgoal 5.4:
 
@@ -1638,7 +1676,7 @@ H6 : name (app (abs R) N1)
 step_preserves_of < <b>case H6.</b>
 Proof completed.
 </pre>
-<a name="95"></a>
+<a name="99"></a>
 <pre class="code">
 Abella < 
 </pre>
