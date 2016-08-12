@@ -61,9 +61,26 @@ induction on 1. intros. case H1.
 
 
 Theorem abs_arr: forall L R N U T,
-  ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.
+  ctx L -> {L |- of (abs R) (arr U 젊은 여성은 안으로 들어가는 남성에게 “아직 고맙다고 말할 기회도 없었네요.”라고 대답했다. 나는 움찔했다.
 
-skip. % This must be true but don't yet have an idea how to prove in Abella
+내게도 같은 일이 정말 자주 일어났기 때문에 움찔한 것이었다. 사람들은 나를 위해 문을 잡아준 다음 빈정거리며 “천만에요.”, “고마워요.” 같은 말을 하곤 했다. 내가 입을 열기도 전에, 혹은 이미 고맙다고 말을 했지만 내 목소리가 작아서 못 들었을 때였다. 나는 그런 행동을 ‘에티켓 수치’라고 부르는데, 그들이 남을 비난하는 것이 그들이 지적하는 에티켓 상의 실수보다 훨씬 더 무례하다는 걸 깨닫지 못한다는 게 놀랍다. 이번 경우 수치를 당한 여성은 너무나 작았고 굉장히 예의 바르게 말했기 때문에 나는 그녀의 입장에서 화가 났다. 그러나 궁금하기도 했다.T)} -> {L |- of N U} -> {L |- of (R N) T}.
+% thanks to Kaustuv Chaudhuri 
+induction on 2. intros. case H2. 
+  % Subgoal 1
+  inst H4 with n1 = N. cut H5 with H3. search.
+  % Subgoal 2
+  case H4.
+    assert {L |- of N T1}. apply IH to _ H5 H7. search. % 2.1
+    apply IH to _ H5 H3. search.                        % 2.2
+    apply of_name to _ H7. case H6.                     % 2.3
+  % Subgoal 3
+  case H4.
+    skip. % 3.1
+    assert {L |- of N T3}. apply IH to _ H5 H7. search. % 3.2
+    apply IH to _ H5 _. search.                         % 3.4
+    apply of_name to _ H7. case H6.
+  % Subgoal 4
+  apply of_name to _ H5. case H6. case H4.
 
 
 Theorem step_preserves_of: forall L M N T,
@@ -86,3 +103,10 @@ case H2.
   apply of_name to _ H5.
   case H4. case H3. case H6. case H6. case H6. case H6.
 
+
+% theorem subst : forall L U R T N, nabla x,
+%   ctx L -> {L, of x U |- of (R x) T} -> {L |- of N U} ->
+%     {L |- of (R N) T}.
+% intros.
+% inst H2 with n1 = N.
+% cut H4 with H3. search.
