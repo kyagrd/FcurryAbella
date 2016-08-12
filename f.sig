@@ -9,6 +9,7 @@ type app	tm -> tm -> tm.
 type abs        (tm -> tm) -> tm.
 
 type inst	ty -> ty -> o.
+type insts	ty -> ty -> o.
 type of         tm -> ty -> o.
 
 type step	tm -> tm -> o.
