@@ -95,8 +95,8 @@ Theorem step_preserves_of : forall L M N T,
   ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.
 % Proof:
 induction on 2. intros. case H2.
-  case H3.
   % Subgoal 1
+  case H3.
     apply IH to _ H4 H6. search.      % 1.1
     apply IH to _ H5 H6. search.      % 1.2
     apply abs_arr to _ H4 H5. search. % 1.3 (abs_arr lemma used)

@@ -1,2 +1,96 @@
-% vim: sw=2: ts=2: expandtab: ai: syntax=lprolog
+% vim: sw=2: ts=2: expandtab: ai:
 Specification "fw".
+
+Close ty, tm, ki.
+
+Theorem member_prune' : forall L E, nabla (x : ty),
+  member (E x) L -> exists F, E = x\ F.
+% Proof:
+induction on 1. intros. case H1.
+  search.
+  apply IH to H2. search.
+% Q.E.D.
+
+Theorem member_prune : forall L E, nabla (x : tm),
+  member (E x) L -> exists F, E = x\ F.
+% Proof:
+induction on 1. intros. case H1.
+  search.
+  apply IH to H2. search.
+% Q.E.D.
+
+Define ctx : olist -> prop
+by ctx nil
+ ; nabla x, ctx (of x T :: L) := ctx L
+ ; nabla x, ctx (of' x K :: L) := ctx L
+ .
+
+Define name : tm -> prop by nabla x, name x.
+Define name' : ty -> prop by nabla x, name' x.
+
+Theorem of_name : forall L E, ctx L -> member E L ->
+  ( (exists X T, E = of X T /\ name X) \/
+    (exists X K, E = of' X K /\ name' X) ).
+% Proof:
+induction on 1. intros. case H1.
+  case H2.
+  case H2.
+    search.
+    apply member_prune to H4. backchain IH.
+  case H2.
+    search.
+    apply member_prune' to H4. backchain IH.
+% Q.E.D.
+
+Theorem ctx_uniq : forall L E T1 T2,
+  ctx L -> member (of E T1) L -> member (of E T2) L -> T1 = T2.
+% Proof:
+induction on 1. intros. case H1.
+  case H2.
+  case H2.
+    case H3.
+      search.
+      apply member_prune to H5.
+    case H3.
+      apply member_prune to H5.
+      apply IH to H4 H5 H6. search.
+  case H2. case H3. backchain IH.
+% Q.E.D.
+
+Theorem ctx_uniq' : forall L T K1 K2,
+  ctx L -> member (of' T K1) L -> member (of' T K2) L -> K1 = K2.
+% Proof:
+induction on 1. intros. case H1.
+  case H2.
+  case H2. case H3. backchain IH.
+  case H2.
+    case H3.
+      search.
+      apply member_prune' to H5.
+    case H3.
+      apply member_prune' to H5.
+      apply IH to H4 H5 H6. search.
+% Q.E.D.
+
+Theorem step_preserves_of' : forall L T U K,
+  ctx L -> {L |- of' T K} -> {step' T U} -> {L |- of' U K}.
+% Proof:
+induction on 2. intros. case H2.
+  % Subgoal 1
+  case H3.
+    apply IH to _ H4 H6. search.      % 1.1
+    apply IH to _ H5 H6. search.      % 1.2
+  % Subgoal 2
+  case H3. apply IH to _ H4 H5. search.
+  % Subgoal 3
+  case H3.
+    apply IH to _ H4 H6. search.
+    apply IH to _ H5 H6. search.
+  % Subgoal 4
+  case H3. apply IH to _ H4 H5. search.
+  % Subgoal 5
+  apply of_name to _ H5. case H6.
+    case H4.
+    case H4. case H3. case H7. case H7. case H7. case H7. case H7. case H7.
+% Q.E.D.
+
