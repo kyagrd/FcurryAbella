@@ -6,23 +6,25 @@ kind tm, ty, ki  type.
 type star  ki.
 type karr  ki -> ki -> ki.
 
-type arr  ty -> ty -> ty.
-type all  ki -> (ty -> ty) -> ty.
-type apt  ty -> ty -> ty.
-type abt  ki -> (ty -> ty) -> ty.
+% type constructors
+type arr  ty -> ty -> ty.         % function type
+type all  ki -> (ty -> ty) -> ty. % universally quantified type
+type apt  ty -> ty -> ty.         % type application
+type abt  ki -> (ty -> ty) -> ty. % type abstraction
 
-type app  tm -> tm -> tm.
-type abs  (tm -> tm) -> tm.
+% terms
+type app  tm -> tm -> tm.    % application
+type abs  (tm -> tm) -> tm.  % abstraction
 
-type inst  ty -> ty -> o.
-type insts ty -> ty -> o.
+type ins  ty -> ty -> o. % type insantiation (one variable)
+type ins* ty -> ty -> o. % type insantiation (many variables)
 
-type of   tm -> ty -> o.
-type of'  ty -> ki -> o.
-type eqt  ty -> ty -> ki -> o.
+type of   tm -> ty -> o.  % typing judgemnet
+type of'  ty -> ki -> o.  % kinding judgemnet
+type eqt  ty -> ty -> ki -> o. % type equality (requires well-kinded)
 
-type step   tm -> tm -> o.
-type steps  tm -> tm -> o.
+type step   tm -> tm -> o. % one step reduction of terms
+type steps  tm -> tm -> o. % many steps of term reduction
 
-type step'  ty -> ty -> o.
-type steps' ty -> ty -> o.
+type step'  ty -> ty -> o. % one step reduction of types
+type steps' ty -> ty -> o. % many steps of type reduction

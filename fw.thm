@@ -19,9 +19,11 @@ induction on 1. intros. case H1.
   apply IH to H2. search.
 % Q.E.D.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Define ctx : olist -> prop
 by ctx nil
- ; nabla x, ctx (of x T :: L) := ctx L
+ ; nabla x, ctx (of x F :: L) := ctx L /\ exists K, {L |- of' F K}
  ; nabla x, ctx (of' x K :: L) := ctx L
  .
 
@@ -50,10 +52,10 @@ induction on 1. intros. case H1.
   case H2.
     case H3.
       search.
-      apply member_prune to H5.
+      apply member_prune to H6.
     case H3.
-      apply member_prune to H5.
-      apply IH to H4 H5 H6. search.
+      apply member_prune to H6.
+      apply IH to H4 H6 H7. search.
   case H2. case H3. backchain IH.
 % Q.E.D.
 
@@ -72,25 +74,185 @@ induction on 1. intros. case H1.
       apply IH to H4 H5 H6. search.
 % Q.E.D.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Theorem abt_karr_k1 : forall L F K1 K2 K, ctx L ->
+  {L |- of' (abt K2 F) (karr K1 K)} -> K1 = K2.
+% Proof:
+induction on 2. intros. case H2.
+  search.
+  apply of_name to _ H4. case H5. case H3. case H3. case H6.
+% Q.E.D.
+
+Theorem abt_karr : forall L F G K1 K2, ctx L ->
+  {L |- of' (abt K1 F) (karr K1 K2)} -> {L |- of' G K1} -> {L |- of' (F G) K2}.
+% Proof:
+induction on 2. intros. case H2.
+  inst H4 with n1 = G. cut H5 with H3. search.
+  apply of_name to _ H5. case H6. case H4. case H4. case H7.
+% Q.E.D.
+
 Theorem step_preserves_of' : forall L T U K,
-  ctx L -> {L |- of' T K} -> {step' T U} -> {L |- of' U K}.
+  ctx L -> {L |- of' T K} -> {L |- step' T U} -> {L |- of' U K}.
 % Proof:
 induction on 2. intros. case H2.
   % Subgoal 1
   case H3.
-    apply IH to _ H4 H6. search.      % 1.1
-    apply IH to _ H5 H6. search.      % 1.2
+    apply IH to _ H4 H6. search.
+    apply IH to _ H5 H6. search.
+    apply of_name to _ H7. case H8. case H6. case H6.
   % Subgoal 2
-  case H3. apply IH to _ H4 H5. search.
+  case H3.
+    apply IH to _ H4 H5. search.
+    apply of_name to _ H6. case H7. case H5. case H5.
   % Subgoal 3
   case H3.
     apply IH to _ H4 H6. search.
     apply IH to _ H5 H6. search.
+    apply abt_karr_k1 to _ H4. apply abt_karr to _ H4 H5. search.
+    apply of_name to _ H7. case H8. case H6. case H6.
   % Subgoal 4
-  case H3. apply IH to _ H4 H5. search.
+  case H3.
+    apply IH to _ H4 H5. search.
+    apply of_name to _ H6. case H7. case H5. case H5.
   % Subgoal 5
   apply of_name to _ H5. case H6.
+    % Subgoal 5.1
     case H4.
-    case H4. case H3. case H7. case H7. case H7. case H7. case H7. case H7.
+    % Subgoal 5.2
+    case H4. case H3.
+    case H7. case H7. case H7. case H7. case H7. case H7. case H7.
+    apply of_name to _ H9. case H10. case H8. case H8.
 % Q.E.D.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Theorem eqt_refl : forall L F K, ctx L -> {L |- of' F K} -> {L |- eqt F F K}.
+% Proof:
+intros. search. % by definition trivial
+% Q.E.D.
+ 
+Theorem eqt_symm : forall L F G K,
+  ctx L -> {L |- eqt F G K} -> {L |- eqt G F K}.
+% Proof:
+intros. search. % by definition trivial
+% Q.E.D.
+
+Theorem eqt_trans : forall L F G H K, ctx L ->
+  {L |- eqt F G K} -> {L |- eqt G H K} -> {L |- eqt F H K}.
+% Proof:
+intros. search. % by definition trivial
+% Q.E.D.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Theorem of_star : forall L M T, ctx L -> {L |- of M T} -> {L |- of' T star}.
+%% % Proof:
+%% induction on 2. intros. case H2.
+%%   % Subgoal 1
+%%   apply IH to _ H3. case H5.
+%%     search.
+%%     apply of_name to _ H7. case H8. case H6. case H6. case H9.
+%%   % Subgoal 2
+%%   search.
+%%   % Subgoal 3
+%%   search.
+%%   % Subgoal 4
+%%   apply IH to _ H4.
+%%   case H5.
+%%     inst H6 with n1 = U. cut H7 with H3. search.
+%%     apply of_name to _ H7. case H8. case H6. case H6. case H9.
+%%   % Subgoal 5
+%%   apply IH to _ H3.
+%%   skip. % eqt of' lemma
+%%   % Subgoal 6
+%%   apply of_name to _ H4. case H5.
+%%     case H3. skip. % TODOk/of
+%%     case H3.
+%% % Q.E.D.
+
+Theorem of_eqt : forall L N T U K, ctx L ->
+  {L |- of N T} -> {L |- eqt T U K} -> {L |- of N U}.
+skip.
+
+Theorem eqt_ins1 : forall L S1 S2 T K, ctx L ->
+  {L |- eqt S1 S2 K} -> {L |- ins* S1 T} -> {L |- ins* S2 T}.
+skip.
+
+Theorem eqt_ins2 : forall L S1 S2 T K, ctx L ->
+  {L |- eqt S1 S2 K} -> {L |- ins* S2 T} -> {L |- ins* S1 T}.
+% Proof:
+intros. apply eqt_symm to _ H2. backchain eqt_ins1.
+% Q.E.D.
+
+Theorem abs_ins_arr : forall L R N U T S,
+  ctx L -> {L |- of (abs R) S} -> {L |- ins* S (arr U T)} ->
+  {L |- of N U} -> {L |- of (R N) T}.
+% Proof:
+induction on 2. intros. case H2.
+  % Subgoal 1
+  case H3.
+    inst H5 with n1 = N. cut H7 with H4. search.
+    case H7. apply of_name to _ H10. case H11. case H9. case H9.
+    apply of_name to _ H8. case H9. case H7. case H7.
+  % Subgoal 2
+  case H3.
+    case H7.
+      inst H5 with n1 = U2. skip. % TODO TODO TODO
+      apply of_name to _ H10. case H11. case H9. case H9.
+    apply of_name to _ H8. case H9. case H7. case H7.
+  % Subgoal 3
+  assert {L |- ins* (all K T1) (arr U T)}.
+  apply IH to _ H6 H7 H4. search.
+  % Subgoal 4
+  backchain IH with R = R.
+  backchain eqt_ins2.
+  % Subgoal 5
+  apply of_name to _ H6. case H7. case H5. case H8. case H5.
+% Q.E.D.
+
+Theorem abs_arr : forall L R N U T,
+  ctx L -> {L |- of (abs R) (arr U T)} -> {L |- of N U} -> {L |- of (R N) T}.
+% Proof:
+induction on 2. intros. case H2.
+  % Subgoal 1
+  inst H4 with n1 = N. cut H6 with H3. search.
+  % Subgoal 2 (abs_ins_arr lemma used)
+  case H4.
+    % Subgoal 2.1
+    assert {L |- ins* (all K (z1\arr (T2 z1) (T3 z1))) (arr (T2 U1) (T3 U1))}.
+    apply abs_ins_arr to _ H6 H7 H3. search.
+    % Subgoal 2.2
+    assert {L |- ins* (all K (z1\z1)) (arr U T)}.
+    apply abs_ins_arr to _ H6 H7 H3. search.
+  % Subgoal 3
+  backchain IH with R = R. backchain of_eqt.
+  % Subgoal 4
+  apply of_name to _ H5. case H6. case H4. case H7. case H4.
+% Q.E.D.
+
+Theorem step_preserves_of : forall L M N T,
+  ctx L -> {L |- of M T} -> {step M N} -> {L |- of N T}.
+% Proof:
+induction on 2. intros. case H2.
+  % Subgoal 1
+  case H3.
+    apply IH to _ H4 H6. search.
+    apply IH to _ H5 H6. search.
+    apply abs_arr to _ H4 H5. search.
+  % Subgoal 2
+  case H3. apply IH to _ H4 H6.
+    case H5. search.
+    apply of_name to _ H8. case H9. case H7. case H7. case H10.
+  search. 
+  % Subgoal 3
+  apply IH to _ H4 H3. search.
+  % Subgoal 4
+  apply IH to _ H5 H3. search.
+  % Subgoal 5
+  apply IH to _ H4 H3. apply of_eqt to _ H6 H5. search.
+  % Subgoal 6
+  apply of_name to _ H5. case H6.
+    case H4. case H3. case H7. case H7. case H7. case H7.
+    case H4.
+% Q.E.D.
