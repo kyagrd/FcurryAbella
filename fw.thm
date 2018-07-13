@@ -3,15 +3,24 @@ Specification "fw".
 
 Close ty, tm, ki.
 
-Theorem member_prune' : forall L E, nabla (x : ty),
-  member (E x) L -> exists F, E = x\ F.
-% Proof:
-induction on 1. intros. case H1.
-  search.
-  apply IH to H2. search.
+Define name : A -> prop by nabla x, name x.
+Define fresh : A -> B -> prop by nabla x, fresh x E.
+
+Theorem fresh_is_name[A,B] : forall (x : A) (E : B),
+  fresh x E -> name x.
+% Proof
+intros. case H1. search.
 % Q.E.D.
 
-Theorem member_prune : forall L E, nabla (x : tm),
+Theorem member_fresh[A] : forall (X : A) L E,
+  member E L -> fresh X L -> fresh X E.
+% Proof
+induction on 1. intros. case H1.
+case H2. search.
+case H2. backchain IH.
+% Q.E.D.
+
+Theorem member_prune[T] : forall L E, nabla (x : T),
   member (E x) L -> exists F, E = x\ F.
 % Proof:
 induction on 1. intros. case H1.
@@ -27,21 +36,18 @@ by ctx nil
  ; nabla x, ctx (of' x K :: L) := ctx L
  .
 
-Define name : tm -> prop by nabla x, name x.
-Define name' : ty -> prop by nabla x, name' x.
-
 Theorem of_name : forall L E, ctx L -> member E L ->
   ( (exists X T, E = of X T /\ name X) \/
-    (exists X K, E = of' X K /\ name' X) ).
+    (exists X K, E = of' X K /\ name X) ).
 % Proof:
 induction on 1. intros. case H1.
   case H2.
   case H2.
     search.
-    apply member_prune to H4. backchain IH.
+    apply member_prune[tm] to H5. backchain IH.
   case H2.
     search.
-    apply member_prune' to H4. backchain IH.
+    apply member_prune[ty] to H4. backchain IH.
 % Q.E.D.
 
 Theorem ctx_uniq : forall L E T1 T2,
@@ -52,9 +58,9 @@ induction on 1. intros. case H1.
   case H2.
     case H3.
       search.
-      apply member_prune to H6.
+      apply member_prune[tm] to H6.
     case H3.
-      apply member_prune to H6.
+      apply member_prune[tm] to H6.
       apply IH to H4 H6 H7. search.
   case H2. case H3. backchain IH.
 % Q.E.D.
@@ -68,12 +74,42 @@ induction on 1. intros. case H1.
   case H2.
     case H3.
       search.
-      apply member_prune' to H5.
+      apply member_prune[ty] to H5.
     case H3.
-      apply member_prune' to H5.
+      apply member_prune[ty] to H5.
       apply IH to H4 H5 H6. search.
 % Q.E.D.
 
+Theorem ctx_name_of': forall L X K, ctx L -> name X -> {L |- of' X K} -> member (of' X K) L.
+% Proof:
+induction on 3. intros. case H3.
+case H2.
+case H2.
+case H2.
+case H2.
+apply of_name to _ H5. case H6. case H4. case H4. search.
+% Q.E.D.
+ 
+Theorem of_uniq' : forall L T K1 K2, ctx L -> {L |- of' T K1} -> {L |- of' T K2} -> K1 = K2.
+% Proof:
+induction on 2. intros. case H2.
+case H3.
+  apply IH to _ H4 H6. search.
+  apply of_name to _ H7. case H8. case H6. case H6. case H9.
+case H3.
+  search.
+  apply of_name to _ H6. case H7. case H5. case H5. case H8.
+case H3.
+  apply IH to _ H5 H7. apply IH to _ H4 H6. search.
+  apply of_name to _ H7. case H8. case H6. case H6. case H9.
+case H3.
+  apply IH to _ H4 H5. search. 
+  apply of_name to _ H6. case H7. case H5. case H5. case H8.
+apply of_name to _ H5. case H6.
+  case H4.
+  case H4. backchain ctx_uniq'. backchain ctx_name_of'.
+% Q.E.D.
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Theorem abt_karr_k1 : forall L F K1 K2 K, ctx L ->
@@ -135,7 +171,7 @@ intros. search. % by definition trivial
 Theorem eqt_symm : forall L F G K,
   ctx L -> {L |- eqt F G K} -> {L |- eqt G F K}.
 % Proof:
-intros. search. % by definition trivial
+intros. search.  % by definition trivial
 % Q.E.D.
 
 Theorem eqt_trans : forall L F G H K, ctx L ->
@@ -146,39 +182,37 @@ intros. search. % by definition trivial
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Theorem of_star : forall L M T, ctx L -> {L |- of M T} -> {L |- of' T star}.
-%% % Proof:
-%% induction on 2. intros. case H2.
-%%   % Subgoal 1
-%%   apply IH to _ H3. case H5.
-%%     search.
-%%     apply of_name to _ H7. case H8. case H6. case H6. case H9.
-%%   % Subgoal 2
-%%   search.
-%%   % Subgoal 3
-%%   search.
-%%   % Subgoal 4
-%%   apply IH to _ H4.
-%%   case H5.
-%%     inst H6 with n1 = U. cut H7 with H3. search.
-%%     apply of_name to _ H7. case H8. case H6. case H6. case H9.
-%%   % Subgoal 5
-%%   apply IH to _ H3.
-%%   skip. % eqt of' lemma
-%%   % Subgoal 6
-%%   apply of_name to _ H4. case H5.
-%%     case H3. skip. % TODOk/of
-%%     case H3.
+Theorem of_star : forall L M T, ctx L -> {L |- of M T} -> {L |- of' T star}.
+% Proof:
+induction on 2. intros. case H2.
+  % Subgoal 1
+  apply IH to _ H3. case H5.
+    search.
+    apply of_name to _ H7. case H8. case H6. case H6. case H9.
+  % Subgoal 2
+  search.
+  % Subgoal 3
+  search.
+  % Subgoal 4
+  apply IH to _ H4.
+  case H5.
+    inst H6 with n1 = U. cut H7 with H3. search.
+    apply of_name to _ H7. case H8. case H6. case H6. case H9.
+  % Subgoal 5
+  apply IH to _ H3.
+  skip. % eqt of' lemma
+  % Subgoal 6
+  apply of_name to _ H4. case H5.
+    case H3. skip. % TODOk/of
+    case H3.
 %% % Q.E.D.
 
 Theorem of_eqt : forall L N T U K, ctx L ->
   {L |- of N T} -> {L |- eqt T U K} -> {L |- of N U}.
-skip.
+induction on 3. intros. case H3. 
+search.
 
-Theorem eqt_ins1 : forall L S1 S2 T K, ctx L ->
-  {L |- eqt S1 S2 K} -> {L |- ins* S1 T} -> {L |- ins* S2 T}.
-skip.
-
+ 
 Theorem eqt_ins2 : forall L S1 S2 T K, ctx L ->
   {L |- eqt S1 S2 K} -> {L |- ins* S2 T} -> {L |- ins* S1 T}.
 % Proof:

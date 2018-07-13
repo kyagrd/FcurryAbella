@@ -12,14 +12,9 @@ of N (all K T) :- pi a\ of' a K => of N (T a), pi a\ of' a K => of' (T a) star.
 of N (T U) :- of' U K, of N (all K T).
 of N T :- of N U, eqt U T K.
 
-eqt (apt (abt K1 F) G) (F G) K :- of' G K1, of' (F G) K. % beta
 eqt F F K :- of' F K.                % reflexive
-eqt F G K :- eqt G F K.              % symmetric
-eqt F H K :- eqt F G K, eqt G H K.   % transitive
-eqt (arr T1 U1) (arr T2 U2) star :- eqt T1 T2 star, eqt U1 U2 star.
-eqt (all K T) (all K U) star :- pi a\ of' a K => eqt (T a) (U a) star.
-eqt (apt F1 G1) (apt F2 G2) K2 :- eqt F1 F2 (karr K1 K2), eqt G1 G2 K1.
-eqt (abt K1 F) (abt K1 G) (karr K1 K2) :- pi a\ of' a K1 => eqt (F a) (G a) K2.
+eqt F G K :- of' F K, of' G K, step' F F1, eqt F1 G K. % step left
+eqt F G K :- of' F K, of' G K, step' G G1. eqt F G1 K. % step right
 
 ins (all K T) (T U) :- of' U K.
 
